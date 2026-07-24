@@ -516,8 +516,8 @@
   }
   .polaroid img{
     width:100%;
-    height:100px;
-    object-fit:cover;
+    height:110px;
+    object-fit:contain;
     display:block;
     border-radius:2px;
   }
@@ -541,15 +541,22 @@
   /* ---------- closing interaction ---------- */
   .closing-heart{
     margin-top:2rem;
-    width:60px; height:60px;
+    width:74px; height:74px;
     border-radius:50%;
     border:none;
-    background:linear-gradient(135deg, var(--rose), #d92e60);
-    font-size:1.5rem;
-    color:#fff;
+    background:transparent;
+    padding:0;
     box-shadow:0 10px 22px rgba(238,63,115,.35);
     cursor:pointer;
     transition:transform .15s ease;
+    overflow:hidden;
+  }
+  .closing-heart img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    pointer-events:none;
   }
   .closing-heart:active{ transform:scale(.86); }
 
@@ -648,9 +655,10 @@
   </div>
 
   <div class="emoji-picker">
-    <div class="emoji-chip" data-emoji="❤️">❤️</div>
     <div class="emoji-chip" data-emoji="😽">😽</div>
+    <div class="emoji-chip" data-emoji="❣️">❣️</div>
     <div class="emoji-chip" data-emoji="😍">😍</div>
+    <div class="emoji-chip" data-emoji="🫶">🫶</div>
   </div>
   <div class="trade-hint" id="trade-hint">pick what you're feeling, then hit accept</div>
 </div>
@@ -669,7 +677,7 @@
     Happy Monthsary Bebi!! I can't believe it, 3 months na tayo! Heheheh parang last time lang nahihiya pa tayo, look at us now! I can believe it, I'm so so so so happy na magkasama tau together padin, thank you for putting up with my kulit and pagkakamali. I love love love you so much and I'm sorry if we can't be together for our special day :( I hope you know na I love love love you sooo much!!! Hehehehehhe, More months and years and decades to come!
   </div>
 
-  <button class="closing-heart" id="closing-heart" aria-label="Tap for one more surprise">💗</button>
+  <button class="closing-heart" id="closing-heart" aria-label="Tap for one more surprise"><img src="heart-button.png" alt="Heart"></button>
   <div class="closing-msg" id="closing-msg"></div>
   <button class="replay-link" id="replay-btn">start over ↺</button>
 </div>
