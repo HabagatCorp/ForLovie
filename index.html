@@ -573,6 +573,25 @@
     cursor:pointer;
   }
 
+  .music-toggle{
+    position:fixed;
+    top:max(16px, env(safe-area-inset-top));
+    right:16px;
+    z-index:80;
+    width:42px; height:42px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,.75);
+    box-shadow:0 6px 16px rgba(107,70,193,.25);
+    font-size:1.15rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .music-toggle:active{ transform:scale(.88); }
+
   @media (prefers-reduced-motion: reduce){
     *{ animation:none !important; transition:none !important; }
   }
@@ -582,6 +601,7 @@
 
 <canvas id="confetti-canvas"></canvas>
 <div class="wash" id="wash"></div>
+<button class="music-toggle" id="music-toggle" aria-label="Toggle background music">🔊</button>
 
 <div class="screen" id="screen-envelope">
   <h1 class="headline">Happy 3rd Monthsary Baby!! Open Me!</h1>
@@ -611,7 +631,6 @@
 </div>
 
 <div class="screen" id="screen-trade">
-  <div class="trade-eyebrow">one last trade</div>
   <p class="trade-title">put whatever you're feeling on your side. mine's already set.</p>
 
   <div class="trade-frame">
@@ -697,6 +716,30 @@
   }
 
   let audioCtx = null;
+  function getAudioCtx(){
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playClick(){
+    try{
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1050, now);
+      osc.frequency.exponentialRampToValueAtTime(650, now + 0.09);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.16, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    }catch(e){ /* audio not available, silently skip */ }
+  }
+
   function playDing(){
     try{
       audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
@@ -716,6 +759,88 @@
     }catch(e){ /* audio not available, silently skip */ }
   }
 
+  /* ---------- background music (gentle generated pad + sparkle melody) ---------- */
+  let musicStarted = false;
+  let musicMuted = false;
+  let musicGain = null;
+
+  function startBackgroundMusic(){
+    if(musicStarted) return;
+    musicStarted = true;
+    try{
+      const ctx = getAudioCtx();
+      musicGain = ctx.createGain();
+      musicGain.gain.value = musicMuted ? 0 : 0.06;
+      musicGain.connect(ctx.destination);
+
+      // soft alternating pad chords
+      const chords = [
+        [261.63, 329.63, 392.00, 493.88], // C E G B
+        [220.00, 261.63, 329.63, 392.00]  // A C E G
+      ];
+      let chordIndex = 0;
+
+      function playChord(){
+        if(!musicStarted) return;
+        const notes = chords[chordIndex % chords.length];
+        chordIndex++;
+        const now = ctx.currentTime;
+        const chordGain = ctx.createGain();
+        chordGain.gain.setValueAtTime(0.0001, now);
+        chordGain.gain.linearRampToValueAtTime(1, now + 2);
+        chordGain.gain.linearRampToValueAtTime(0.0001, now + 7);
+        chordGain.connect(musicGain);
+
+        notes.forEach(freq=>{
+          const osc = ctx.createOscillator();
+          osc.type = 'sine';
+          osc.frequency.value = freq;
+          osc.connect(chordGain);
+          osc.start(now);
+          osc.stop(now + 7.2);
+        });
+
+        setTimeout(playChord, 6000);
+      }
+      playChord();
+
+      // occasional gentle sparkle notes on top
+      const scale = [523.25, 587.33, 659.25, 783.99, 880.00];
+      function playSparkle(){
+        if(!musicStarted) return;
+        const freq = scale[Math.floor(Math.random()*scale.length)];
+        const now = ctx.currentTime;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(0.3, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+        osc.connect(gain).connect(musicGain);
+        osc.start(now);
+        osc.stop(now + 1.7);
+        setTimeout(playSparkle, 1800 + Math.random()*1800);
+      }
+      setTimeout(playSparkle, 2200);
+    }catch(e){ /* audio not available, silently skip */ }
+  }
+
+  const musicToggleBtn = document.getElementById('music-toggle');
+  musicToggleBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    playClick();
+    musicMuted = !musicMuted;
+    if(musicGain){
+      musicGain.gain.value = musicMuted ? 0 : 0.06;
+    }
+    musicToggleBtn.textContent = musicMuted ? '🔇' : '🔊';
+    startBackgroundMusic();
+  });
+
+  // start music on the very first tap/click anywhere (satisfies mobile autoplay rules)
+  document.addEventListener('click', startBackgroundMusic, { once:true });
+
   function spawnFloatHeart(x, y){
     const el = document.createElement('div');
     el.className = 'float-heart';
@@ -734,7 +859,8 @@
     if(done) return;
     count++;
 
-  
+    playClick();
+
     // visuals
     envelope.classList.remove('tapped');
     void envelope.offsetWidth;
@@ -778,6 +904,7 @@
   const toTradeBtn = document.getElementById('to-trade');
 
   toTradeBtn.addEventListener('click', ()=>{
+    playClick();
     screenReveal.classList.remove('active');
     screenReveal.style.opacity = 0;
     screenReveal.style.transform = 'translateY(-24px) scale(1.05)';
@@ -825,6 +952,7 @@
 
   chips.forEach(chip=>{
     chip.addEventListener('click', ()=>{
+      playClick();
       const emoji = chip.dataset.emoji;
       const idx = selected.indexOf(emoji);
       if(idx > -1){
@@ -837,12 +965,13 @@
       }
       renderSlots();
       tradeHint.textContent = selected.length
-        ? "looking good — hit accept when you're ready"
+        ? "Press Accept if you're good to go!"
         : "pick what you're feeling, then hit accept";
     });
   });
 
   document.getElementById('btn-decline').addEventListener('click', ()=>{
+    playClick();
     tradeHint.textContent = "wait no come back 🥺";
     const frame = document.querySelector('.trade-frame');
     frame.style.transition = 'transform .4s ease';
@@ -852,6 +981,7 @@
   });
 
   document.getElementById('btn-accept').addEventListener('click', ()=>{
+    playClick();
     if(selected.length === 0){
       tradeHint.textContent = "add at least one before you accept 💗";
       return;
@@ -880,6 +1010,7 @@
   let closingIndex = 0;
 
   closingHeart.addEventListener('click', (e)=>{
+    playClick();
     closingMsg.textContent = closingLines[closingIndex % closingLines.length];
     closingIndex++;
     const rect = closingHeart.getBoundingClientRect();
@@ -892,6 +1023,7 @@
   });
 
   replayBtn.addEventListener('click', ()=>{
+    playClick();
     location.reload();
   });
 
