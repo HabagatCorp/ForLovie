@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>a little something 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#efe7fb;
+    --bg-1:#e4d6f7;
+    --purple-deep:#6b46c1;
+    --purple-mid:#8b6fd6;
+    --rose:#ee3f73;
+    --rose-soft:#f8a8c0;
+    --paper:#fbf8ff;
+    --ink:#4a3a6b;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html,body{
+    margin:0; padding:0; height:100%;
+    overflow:hidden;
+    background:var(--bg-0);
+    font-family:'Quicksand',sans-serif;
+    color:var(--ink);
+  }
+
+  body{
+    background:
+      radial-gradient(circle at 20% 15%, var(--bg-1) 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, var(--bg-1) 0%, transparent 50%),
+      var(--bg-0);
+  }
+
+  #confetti-canvas{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    pointer-events:none;
+    z-index:50;
+  }
+
+  .screen{
+    position:fixed; inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* ---------- SCREEN 1: envelope ---------- */
+  #screen-envelope{
+    flex-direction:column;
+    padding:6vh 6vw;
+    text-align:center;
+    transition:opacity .6s ease, transform .6s ease;
+  }
+
+  #screen-envelope.leaving{
+    opacity:0;
+    transform:scale(1.08);
+    pointer-events:none;
+  }
+
+  .eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.72rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--purple-mid);
+    margin-bottom:.6rem;
+    opacity:.85;
+  }
+
+  .headline{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:600;
+    font-size:1.5rem;
+    line-height:1.35;
+    color:var(--purple-deep);
+    margin:0 0 2.4rem;
+    max-width:20ch;
+  }
+
+  .envelope-wrap{
+    position:relative;
+    width:min(72vw, 300px);
+    aspect-ratio:1920/1275;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    touch-action:manipulation;
+    user-select:none;
+    cursor:pointer;
+    background:none;
+    border:none;
+    padding:0;
+  }
+
+  .envelope-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 14px 26px rgba(107,70,193,.28));
+    transform:scale(1);
+    transition:transform .12s ease;
+  }
+
+  .envelope-wrap.tapped img{
+    animation:tapPulse .32s ease;
+  }
+
+  @keyframes tapPulse{
+    0%{ transform:scale(1) rotate(0deg); }
+    35%{ transform:scale(.93) rotate(-2.5deg); }
+    65%{ transform:scale(1.05) rotate(2deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+  }
+
+  .envelope-wrap.shake img{
+    animation:bigShake .5s ease;
+  }
+
+  @keyframes bigShake{
+    0%,100%{ transform:translateX(0) rotate(0); }
+    15%{ transform:translateX(-6px) rotate(-3deg); }
+    30%{ transform:translateX(6px) rotate(3deg); }
+    45%{ transform:translateX(-5px) rotate(-2deg); }
+    60%{ transform:translateX(5px) rotate(2deg); }
+    75%{ transform:translateX(-3px) rotate(-1deg); }
+    90%{ transform:translateX(3px) rotate(1deg); }
+  }
+
+  .hint{
+    margin-top:1.9rem;
+    font-size:.85rem;
+    color:var(--purple-mid);
+    font-weight:600;
+    min-height:1.2em;
+  }
+
+  /* progress ring of hearts */
+  .progress{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:4px;
+    max-width:260px;
+    margin:1.3rem auto 0;
+  }
+  .pip{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:#d8c8f2;
+    transition:background .25s ease, transform .25s ease;
+  }
+  .pip.on{
+    background:var(--rose);
+    transform:scale(1.25);
+  }
+
+  /* floating hearts that pop off each tap */
+  .float-heart{
+    position:fixed;
+    font-size:1.4rem;
+    pointer-events:none;
+    z-index:40;
+    animation:floatUp 900ms ease-out forwards;
+  }
+  @keyframes floatUp{
+    0%{ transform:translateY(0) scale(.6); opacity:0; }
+    15%{ opacity:1; transform:translateY(-10px) scale(1); }
+    100%{ transform:translateY(-90px) scale(1.15); opacity:0; }
+  }
+
+  /* ---------- SCREEN 2: reveal ---------- */
+  #screen-reveal{
+    flex-direction:column;
+    text-align:center;
+    padding:8vh 8vw;
+    opacity:0;
+    transform:scale(.94);
+    pointer-events:none;
+    transition:opacity .7s ease .15s, transform .7s ease .15s;
+  }
+
+  #screen-reveal.active{
+    opacity:1;
+    transform:scale(1);
+    pointer-events:auto;
+  }
+
+  .reveal-heart{
+    font-size:2.6rem;
+    margin-bottom:1rem;
+    animation:bob 2.6s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-8px); }
+  }
+
+  .reveal-eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.72rem;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:.7rem;
+  }
+
+  .reveal-title{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:700;
+    font-size:1.9rem;
+    color:var(--purple-deep);
+    margin:0 0 .9rem;
+    line-height:1.25;
+  }
+
+  .reveal-body{
+    font-size:1rem;
+    line-height:1.65;
+    color:var(--ink);
+    max-width:32ch;
+    margin:0 auto;
+    opacity:.9;
+  }
+
+  .reveal-note{
+    margin-top:2.2rem;
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.78rem;
+    letter-spacing:.03em;
+    color:var(--purple-mid);
+  }
+
+  .continue-btn{
+    margin-top:2.4rem;
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:600;
+    font-size:.95rem;
+    color:#fff;
+    background:linear-gradient(135deg, var(--rose), #d92e60);
+    border:none;
+    border-radius:999px;
+    padding:.85rem 2.1rem;
+    box-shadow:0 10px 22px rgba(238,63,115,.35);
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .continue-btn:active{ transform:scale(.95); }
+
+  /* ---------- SCREEN 3: adopt me trade ---------- */
+  #screen-trade{
+    flex-direction:column;
+    padding:5vh 5vw;
+    opacity:0;
+    transform:scale(.94);
+    pointer-events:none;
+    transition:opacity .6s ease, transform .6s ease;
+  }
+  #screen-trade.active{
+    opacity:1; transform:scale(1); pointer-events:auto;
+  }
+
+  .trade-eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.7rem;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--purple-mid);
+    margin-bottom:.5rem;
+  }
+  .trade-title{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:600;
+    font-size:1.15rem;
+    color:var(--purple-deep);
+    margin:0 0 1.1rem;
+    max-width:26ch;
+  }
+
+  .trade-frame{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    aspect-ratio:735/414;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 16px 34px rgba(107,70,193,.3);
+  }
+  .trade-frame img.bg{
+    width:100%; height:100%;
+    display:block;
+    object-fit:cover;
+  }
+  .slot{
+    position:absolute;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:clamp(1.1rem, 6vw, 1.8rem);
+    line-height:1;
+  }
+  .slot.you{
+    cursor:pointer;
+  }
+  .slot.you.filled{
+    animation:slotPop .28s ease;
+  }
+  @keyframes slotPop{
+    0%{ transform:scale(.5); }
+    60%{ transform:scale(1.15); }
+    100%{ transform:scale(1); }
+  }
+
+  .btn-hit{
+    position:absolute;
+    cursor:pointer;
+  }
+
+  .emoji-picker{
+    display:flex;
+    gap:.7rem;
+    margin-top:1.4rem;
+  }
+  .emoji-chip{
+    width:52px; height:52px;
+    border-radius:16px;
+    background:var(--paper);
+    border:2px solid #ddceef;
+    font-size:1.5rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .emoji-chip.selected{
+    border-color:var(--rose);
+    background:#fff0f4;
+    transform:translateY(-3px);
+  }
+  .emoji-chip:active{ transform:scale(.9); }
+
+  .trade-hint{
+    margin-top:1rem;
+    font-size:.82rem;
+    color:var(--purple-mid);
+    font-weight:600;
+    text-align:center;
+    min-height:1.2em;
+  }
+
+  /* ---------- SCREEN 4: final letter + photos ---------- */
+  #screen-final{
+    flex-direction:column;
+    padding:6vh 7vw;
+    text-align:center;
+    opacity:0;
+    transform:scale(.94);
+    pointer-events:none;
+    transition:opacity .7s ease, transform .7s ease;
+    overflow-y:auto;
+  }
+  #screen-final.active{
+    opacity:1; transform:scale(1); pointer-events:auto;
+  }
+
+  .final-eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.7rem;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:.6rem;
+  }
+  .final-title{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:700;
+    font-size:1.7rem;
+    color:var(--purple-deep);
+    margin:0 0 1.2rem;
+  }
+
+  .photo-row{
+    display:flex;
+    gap:.7rem;
+    justify-content:center;
+    margin-bottom:1.6rem;
+    flex-wrap:wrap;
+  }
+  .photo-slot{
+    width:104px; height:104px;
+    border-radius:14px;
+    object-fit:cover;
+    background:var(--paper);
+    border:3px solid #fff;
+    box-shadow:0 6px 16px rgba(107,70,193,.22);
+  }
+
+  .letter-card{
+    background:var(--paper);
+    border-radius:18px;
+    padding:1.6rem 1.4rem;
+    max-width:420px;
+    text-align:left;
+    box-shadow:0 12px 26px rgba(107,70,193,.18);
+    font-size:.95rem;
+    line-height:1.7;
+    color:var(--ink);
+  }
+  .letter-card .sign{
+    display:block;
+    margin-top:1rem;
+    font-family:'Bubblegum Sans',cursive;
+    color:var(--rose);
+    font-weight:600;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<div class="screen" id="screen-envelope">
+  <h1 class="headline">Happy 3rd Monthsary Baby!! Open Me!</h1>
+
+  <button class="envelope-wrap" id="envelope" aria-label="Tap the envelope">
+    <img src="envelope.png" alt="A pink envelope with a heart seal">
+  </button>
+
+  <div class="progress" id="progress"></div>
+  <div class="hint" id="hint"></div>
+</div>
+
+<div class="screen" id="screen-reveal">
+  <div class="reveal-heart">🔔</div>
+  <div class="reveal-eyebrow">trade request</div>
+  <h2 class="reveal-title">Trade Incoming!</h2>
+  <p class="reveal-body">
+    Some noob named Brent wants to trade with you!
+  </p>
+  <button class="continue-btn" id="to-trade">view trade 🤝</button>
+</div>
+
+<div class="screen" id="screen-trade">
+  <div class="trade-eyebrow">one last trade</div>
+  <p class="trade-title">put whatever you're feeling on your side. mine's already set.</p>
+
+  <div class="trade-frame">
+    <img class="bg" src="trade.jpg" alt="Trade window">
+    <div class="slot you" data-slot="0" style="left:11.97%; top:25.12%; width:13.74%; height:24.64%;"></div>
+    <div class="slot you" data-slot="1" style="left:27.07%; top:25.12%; width:13.74%; height:24.64%;"></div>
+    <div class="slot you" data-slot="2" style="left:11.97%; top:52.17%; width:13.74%; height:24.40%;"></div>
+    <div class="slot you" data-slot="3" style="left:27.07%; top:52.17%; width:13.74%; height:24.40%;"></div>
+
+    <div class="slot" style="left:58.78%; top:25.12%; width:13.74%; height:24.64%;">💌</div>
+    <div class="slot" style="left:73.88%; top:25.12%; width:13.74%; height:24.64%;">😘</div>
+
+    <div class="btn-hit" id="btn-decline" style="left:26.94%; top:81.4%; width:22.04%; height:11.59%;"></div>
+    <div class="btn-hit" id="btn-accept" style="left:54.15%; top:81.4%; width:22.04%; height:11.59%;"></div>
+  </div>
+
+  <div class="emoji-picker">
+    <div class="emoji-chip" data-emoji="❤️">❤️</div>
+    <div class="emoji-chip" data-emoji="😽">😽</div>
+    <div class="emoji-chip" data-emoji="😍">😍</div>
+  </div>
+  <div class="trade-hint" id="trade-hint">pick what you're feeling, then hit accept</div>
+</div>
+
+<div class="screen" id="screen-final">
+  <div class="final-eyebrow">trade complete</div>
+  <h2 class="final-title">happy monthsary, love</h2>
+
+  <div class="photo-row">
+    <img class="photo-slot" src="photo1.jpg" alt="Photo strip of the two of us">
+    <img class="photo-slot" src="photo2.jpg" alt="Mirror selfie of the two of us">
+    <img class="photo-slot" src="photo3.jpg" alt="Another mirror selfie of the two of us">
+  </div>
+
+  <div class="letter-card">
+    Happy Monthsary Bebi!! I can't believe it, 3 months na tayo! Heheheh parang last time lang nahihiya pa tayo, look at us now! I can believe it, I'm so so so so happy na magkasama tau together padin, thank you for putting up with my kulit and pagkakamali. I love love love you so much and I'm sorry if we can't be together for our special day :( I hope you know na I love love love you sooo much!!! Hehehehehhe, More months and years and decades to come!
+  </div>
+</div>
+
+<script>
+(function(){
+  const TOTAL = 24;
+  let count = 0;
+  let done = false;
+
+  const envelope = document.getElementById('envelope');
+  const progress = document.getElementById('progress');
+  const hint = document.getElementById('hint');
+  const screenEnvelope = document.getElementById('screen-envelope');
+  const screenReveal = document.getElementById('screen-reveal');
+
+  const hints = [
+    "tap it, love",
+    "keep going",
+    "you're doing great",
+    "getting closer",
+    "almost there",
+    "don't stop now",
+    "so close",
+    "one more..."
+  ];
+
+  // build progress pips
+  for(let i=0;i<TOTAL;i++){
+    const p = document.createElement('div');
+    p.className = 'pip';
+    progress.appendChild(p);
+  }
+  const pips = progress.querySelectorAll('.pip');
+
+  const floatEmojis = ['💜','💗','💞','✨','💌'];
+  void hints; // kept only for reference, no longer displayed as text
+
+  function spawnFloatHeart(x, y){
+    const el = document.createElement('div');
+    el.className = 'float-heart';
+    el.textContent = floatEmojis[Math.floor(Math.random()*floatEmojis.length)];
+    el.style.left = (x - 10 + (Math.random()*20-10)) + 'px';
+    el.style.top = (y - 10) + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 950);
+  }
+
+  function updateHint(){
+    // intentionally no text — envelope screen stays down to just the headline
+  }
+
+  function onTap(e){
+    if(done) return;
+    count++;
+
+    // visuals
+    envelope.classList.remove('tapped');
+    void envelope.offsetWidth;
+    envelope.classList.add('tapped');
+
+    const rect = envelope.getBoundingClientRect();
+    const x = (e.touches && e.touches[0]) ? e.touches[0].clientX : (e.clientX || rect.left + rect.width/2);
+    const y = (e.touches && e.touches[0]) ? e.touches[0].clientY : (e.clientY || rect.top);
+    spawnFloatHeart(x, rect.top + rect.height*0.25);
+
+    if(pips[count-1]) pips[count-1].classList.add('on');
+
+    if(navigator.vibrate) navigator.vibrate(12);
+
+    updateHint();
+
+    if(count >= TOTAL){
+      done = true;
+      envelope.classList.add('shake');
+      setTimeout(explode, 420);
+    }
+  }
+
+  envelope.addEventListener('click', onTap);
+
+  function explode(){
+    launchConfetti();
+    setTimeout(()=>{
+      screenEnvelope.classList.add('leaving');
+      screenReveal.classList.add('active');
+    }, 550);
+  }
+
+  /* ---------- screen 2 -> 3: trade ---------- */
+  const screenTrade = document.getElementById('screen-trade');
+  const screenFinal = document.getElementById('screen-final');
+  const toTradeBtn = document.getElementById('to-trade');
+
+  toTradeBtn.addEventListener('click', ()=>{
+    screenReveal.classList.remove('active');
+    screenReveal.classList.add('leaving-out');
+    screenReveal.style.opacity = 0;
+    screenReveal.style.transform = 'scale(1.06)';
+    screenReveal.style.pointerEvents = 'none';
+    setTimeout(()=> screenTrade.classList.add('active'), 300);
+  });
+
+  const chips = document.querySelectorAll('.emoji-chip');
+  const slots = document.querySelectorAll('.slot.you');
+  const tradeHint = document.getElementById('trade-hint');
+  const selected = []; // ordered list of chosen emoji
+
+  function renderSlots(){
+    slots.forEach((slot, i)=>{
+      const emoji = selected[i];
+      if(emoji){
+        if(slot.textContent !== emoji){
+          slot.textContent = emoji;
+          slot.classList.remove('filled');
+          void slot.offsetWidth;
+          slot.classList.add('filled');
+        }
+      } else {
+        slot.textContent = '';
+        slot.classList.remove('filled');
+      }
+    });
+  }
+
+  chips.forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const emoji = chip.dataset.emoji;
+      const idx = selected.indexOf(emoji);
+      if(idx > -1){
+        selected.splice(idx,1);
+        chip.classList.remove('selected');
+      } else {
+        if(selected.length >= 4) return;
+        selected.push(emoji);
+        chip.classList.add('selected');
+      }
+      renderSlots();
+      tradeHint.textContent = selected.length
+        ? "looking good — hit accept when you're ready"
+        : "pick what you're feeling, then hit accept";
+    });
+  });
+
+  document.getElementById('btn-decline').addEventListener('click', ()=>{
+    tradeHint.textContent = "wait no come back 🥺";
+    const frame = document.querySelector('.trade-frame');
+    frame.style.transition = 'transform .4s ease';
+    frame.style.transform = 'translateX(-6px)';
+    setTimeout(()=>{ frame.style.transform = 'translateX(6px)'; }, 100);
+    setTimeout(()=>{ frame.style.transform = 'translateX(0)'; }, 220);
+  });
+
+  document.getElementById('btn-accept').addEventListener('click', ()=>{
+    if(selected.length === 0){
+      tradeHint.textContent = "add at least one before you accept 💗";
+      return;
+    }
+    tradeHint.textContent = "trade accepted 💌";
+    launchConfetti();
+    setTimeout(()=>{
+      screenTrade.classList.remove('active');
+      screenFinal.classList.add('active');
+    }, 500);
+  });
+
+  /* ---------- confetti ---------- */
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let rafId = null;
+
+  function resize(){
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const colors = ['#ee3f73','#f8a8c0','#8b6fd6','#6b46c1','#ffd166','#ffffff'];
+
+  function launchConfetti(){
+    const cx = window.innerWidth/2;
+    const cy = window.innerHeight*0.42;
+    const N = 140;
+    for(let i=0;i<N;i++){
+      const angle = Math.random()*Math.PI*2;
+      const speed = 4 + Math.random()*9;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle)*speed,
+        vy: Math.sin(angle)*speed - 3,
+        size: 5 + Math.random()*6,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        rot: Math.random()*Math.PI*2,
+        vr: (Math.random()-0.5)*0.35,
+        shape: Math.random() < 0.5 ? 'rect' : 'circle',
+        life: 0,
+        maxLife: 90 + Math.random()*40
+      });
+    }
+    if(!rafId) tick();
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+    particles.forEach(p=>{
+      p.life++;
+      p.vy += 0.16; // gravity
+      p.vx *= 0.99;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+
+      const fade = Math.max(0, 1 - p.life/p.maxLife);
+      ctx.save();
+      ctx.globalAlpha = fade;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      if(p.shape === 'rect'){
+        ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size*0.6);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0,0,p.size/2,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+
+    particles = particles.filter(p => p.life < p.maxLife && p.y < window.innerHeight + 40);
+
+    if(particles.length > 0){
+      rafId = requestAnimationFrame(tick);
+    } else {
+      rafId = null;
+      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
