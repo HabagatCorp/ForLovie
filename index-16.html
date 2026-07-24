@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>a little something 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#efe7fb;
+    --bg-1:#e4d6f7;
+    --purple-deep:#6b46c1;
+    --purple-mid:#8b6fd6;
+    --rose:#ee3f73;
+    --rose-soft:#f8a8c0;
+    --paper:#fbf8ff;
+    --ink:#4a3a6b;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+  html,body{
+    margin:0; padding:0; height:100%;
+    overflow:hidden;
+    background:var(--bg-0);
+    font-family:'Quicksand',sans-serif;
+    color:var(--ink);
+  }
+
+  body{
+    background:
+      radial-gradient(circle at 20% 15%, var(--bg-1) 0%, transparent 45%),
+      radial-gradient(circle at 85% 80%, var(--bg-1) 0%, transparent 50%),
+      radial-gradient(circle at 90% 10%, rgba(238,63,115,.14) 0%, transparent 40%),
+      radial-gradient(circle at 8% 88%, rgba(139,111,214,.18) 0%, transparent 42%),
+      var(--bg-0);
+  }
+
+  .bg-decor{
+    position:fixed; inset:0;
+    z-index:0;
+    pointer-events:none;
+    overflow:hidden;
+  }
+  .bg-decor::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    opacity:.5;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,.9) 1.5px, transparent 1.8px);
+    background-size:38px 38px;
+    background-position:0 0;
+    mask-image:radial-gradient(circle at 50% 40%, rgba(0,0,0,.9) 0%, rgba(0,0,0,.35) 60%, transparent 100%);
+    -webkit-mask-image:radial-gradient(circle at 50% 40%, rgba(0,0,0,.9) 0%, rgba(0,0,0,.35) 60%, transparent 100%);
+  }
+  .bg-decor .blob{
+    position:absolute;
+    border-radius:50%;
+    filter:blur(34px);
+    opacity:.55;
+  }
+  .bg-decor .blob-a{
+    width:46vw; height:46vw;
+    top:-14vw; left:-12vw;
+    background:radial-gradient(circle, var(--rose-soft), transparent 70%);
+  }
+  .bg-decor .blob-b{
+    width:56vw; height:56vw;
+    bottom:-20vw; right:-16vw;
+    background:radial-gradient(circle, var(--purple-mid), transparent 70%);
+    opacity:.35;
+  }
+  .bg-decor .blob-c{
+    width:32vw; height:32vw;
+    top:38vh; right:-10vw;
+    background:radial-gradient(circle, var(--rose), transparent 70%);
+    opacity:.2;
+  }
+  .bg-decor .doodle{
+    position:absolute;
+    font-size:1.4rem;
+    opacity:.28;
+    animation:driftDoodle 7s ease-in-out infinite;
+  }
+  .bg-decor .doodle:nth-child(2){ animation-delay:-1.2s; }
+  .bg-decor .doodle:nth-child(3){ animation-delay:-2.4s; }
+  .bg-decor .doodle:nth-child(4){ animation-delay:-3.6s; }
+  .bg-decor .doodle:nth-child(5){ animation-delay:-4.8s; }
+  .bg-decor .doodle:nth-child(6){ animation-delay:-6s; }
+  @keyframes driftDoodle{
+    0%,100%{ transform:translateY(0) rotate(0deg); }
+    50%{ transform:translateY(-16px) rotate(8deg); }
+  }
+
+  #confetti-canvas{
+    position:fixed; inset:0;
+    width:100%; height:100%;
+    pointer-events:none;
+    z-index:50;
+  }
+
+  .wash{
+    position:fixed; inset:0;
+    z-index:65;
+    pointer-events:none;
+    opacity:0;
+    background:linear-gradient(120deg, transparent 30%, rgba(255,255,255,.85) 48%, rgba(238,63,115,.18) 52%, transparent 70%);
+    transform:translateX(-130%);
+  }
+  .wash.run{ animation:washSweep .75s cubic-bezier(.22,1,.36,1); }
+  @keyframes washSweep{
+    0%{ transform:translateX(-130%); opacity:0; }
+    18%{ opacity:1; }
+    55%{ transform:translateX(15%); opacity:1; }
+    100%{ transform:translateX(130%); opacity:0; }
+  }
+
+  .screen{
+    position:fixed; inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:opacity .55s cubic-bezier(.22,1,.36,1), transform .55s cubic-bezier(.22,1,.36,1), filter .55s ease;
+  }
+
+  /* ---------- SCREEN 1: envelope ---------- */
+  #screen-envelope{
+    flex-direction:column;
+    padding:6vh 6vw;
+    text-align:center;
+  }
+
+  #screen-envelope.leaving{
+    opacity:0;
+    transform:translateY(-26px) scale(1.06);
+    filter:blur(8px);
+    pointer-events:none;
+  }
+
+  .eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.72rem;
+    letter-spacing:.28em;
+    text-transform:uppercase;
+    color:var(--purple-mid);
+    margin-bottom:.6rem;
+    opacity:.85;
+  }
+
+  .headline{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:600;
+    font-size:1.5rem;
+    line-height:1.35;
+    color:var(--purple-deep);
+    margin:0 0 2.4rem;
+    max-width:20ch;
+  }
+
+  .envelope-wrap{
+    position:relative;
+    width:min(72vw, 300px);
+    aspect-ratio:1920/1275;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    touch-action:manipulation;
+    user-select:none;
+    cursor:pointer;
+    background:none;
+    border:none;
+    padding:0;
+  }
+
+  .envelope-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 14px 26px rgba(107,70,193,.28));
+    transform:scale(1);
+    transition:transform .12s ease;
+  }
+
+  .envelope-wrap.tapped img{
+    animation:tapPulse .32s ease;
+  }
+
+  @keyframes tapPulse{
+    0%{ transform:scale(1) rotate(0deg); }
+    35%{ transform:scale(.93) rotate(-2.5deg); }
+    65%{ transform:scale(1.05) rotate(2deg); }
+    100%{ transform:scale(1) rotate(0deg); }
+  }
+
+  .envelope-wrap.shake img{
+    animation:bigShake .5s ease;
+  }
+
+  @keyframes bigShake{
+    0%,100%{ transform:translateX(0) rotate(0); }
+    15%{ transform:translateX(-6px) rotate(-3deg); }
+    30%{ transform:translateX(6px) rotate(3deg); }
+    45%{ transform:translateX(-5px) rotate(-2deg); }
+    60%{ transform:translateX(5px) rotate(2deg); }
+    75%{ transform:translateX(-3px) rotate(-1deg); }
+    90%{ transform:translateX(3px) rotate(1deg); }
+  }
+
+  .hint{
+    margin-top:1.9rem;
+    font-size:.85rem;
+    color:var(--purple-mid);
+    font-weight:600;
+    min-height:1.2em;
+  }
+
+  /* progress ring of hearts */
+  .progress{
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:4px;
+    max-width:260px;
+    margin:1.3rem auto 0;
+  }
+  .pip{
+    width:9px; height:9px;
+    border-radius:50%;
+    background:#d8c8f2;
+    transition:background .25s ease, transform .25s ease;
+  }
+  .pip.on{
+    background:var(--rose);
+    transform:scale(1.25);
+  }
+
+  /* floating hearts that pop off each tap */
+  .float-heart{
+    position:fixed;
+    font-size:1.4rem;
+    pointer-events:none;
+    z-index:40;
+    animation:floatUp 900ms ease-out forwards;
+  }
+  @keyframes floatUp{
+    0%{ transform:translateY(0) scale(.6); opacity:0; }
+    15%{ opacity:1; transform:translateY(-10px) scale(1); }
+    100%{ transform:translateY(-90px) scale(1.15); opacity:0; }
+  }
+
+  /* ---------- SCREEN 2: reveal ---------- */
+  #screen-reveal{
+    flex-direction:column;
+    text-align:center;
+    padding:8vh 8vw;
+    opacity:0;
+    transform:translateY(30px) scale(.95);
+    filter:blur(8px);
+    pointer-events:none;
+    transition:opacity .65s cubic-bezier(.22,1,.36,1) .12s, transform .65s cubic-bezier(.22,1,.36,1) .12s, filter .65s ease .12s;
+  }
+
+  #screen-reveal.active{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    filter:blur(0);
+    pointer-events:auto;
+  }
+
+  .reveal-heart{
+    font-size:2.6rem;
+    margin-bottom:1rem;
+    animation:bob 2.6s ease-in-out infinite;
+  }
+  @keyframes bob{
+    0%,100%{ transform:translateY(0); }
+    50%{ transform:translateY(-8px); }
+  }
+
+  .reveal-eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.72rem;
+    letter-spacing:.26em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:.7rem;
+  }
+
+  .reveal-title{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:700;
+    font-size:1.9rem;
+    color:var(--purple-deep);
+    margin:0 0 .9rem;
+    line-height:1.25;
+  }
+
+  .reveal-body{
+    font-size:1rem;
+    line-height:1.65;
+    color:var(--ink);
+    max-width:32ch;
+    margin:0 auto;
+    opacity:.9;
+  }
+
+  .reveal-note{
+    margin-top:2.2rem;
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.78rem;
+    letter-spacing:.03em;
+    color:var(--purple-mid);
+  }
+
+  .continue-btn{
+    margin-top:2.4rem;
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:600;
+    font-size:.95rem;
+    color:#fff;
+    background:linear-gradient(135deg, var(--rose), #d92e60);
+    border:none;
+    border-radius:999px;
+    padding:.85rem 2.1rem;
+    box-shadow:0 10px 22px rgba(238,63,115,.35);
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .continue-btn:active{ transform:scale(.95); }
+
+  /* ---------- SCREEN 3: adopt me trade ---------- */
+  #screen-trade{
+    flex-direction:column;
+    padding:5vh 5vw;
+    opacity:0;
+    transform:translateY(30px) scale(.95);
+    filter:blur(8px);
+    pointer-events:none;
+  }
+  #screen-trade.active{
+    opacity:1; transform:translateY(0) scale(1); filter:blur(0); pointer-events:auto;
+  }
+
+  .trade-eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.7rem;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--purple-mid);
+    margin-bottom:.5rem;
+  }
+  .trade-title{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:600;
+    font-size:1.15rem;
+    color:var(--purple-deep);
+    margin:0 0 1.1rem;
+    max-width:26ch;
+  }
+
+  .trade-frame{
+    position:relative;
+    width:100%;
+    max-width:420px;
+    aspect-ratio:735/414;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 16px 34px rgba(107,70,193,.3);
+  }
+  .trade-frame img.bg{
+    width:100%; height:100%;
+    display:block;
+    object-fit:cover;
+  }
+  .slot{
+    position:absolute;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:clamp(1.1rem, 6vw, 1.8rem);
+    line-height:1;
+  }
+  .slot.you{
+    cursor:pointer;
+  }
+  .slot.you.filled{
+    animation:slotPop .28s ease;
+  }
+  @keyframes slotPop{
+    0%{ transform:scale(.5); }
+    60%{ transform:scale(1.15); }
+    100%{ transform:scale(1); }
+  }
+
+  .btn-hit{
+    position:absolute;
+    cursor:pointer;
+  }
+
+  .emoji-picker{
+    display:flex;
+    gap:.7rem;
+    margin-top:1.4rem;
+  }
+  .emoji-chip{
+    width:52px; height:52px;
+    border-radius:16px;
+    background:var(--paper);
+    border:2px solid #ddceef;
+    font-size:1.5rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .emoji-chip.selected{
+    border-color:var(--rose);
+    background:#fff0f4;
+    transform:translateY(-3px);
+  }
+  .emoji-chip:active{ transform:scale(.9); }
+
+  .trade-hint{
+    margin-top:1rem;
+    font-size:.82rem;
+    color:var(--purple-mid);
+    font-weight:600;
+    text-align:center;
+    min-height:1.2em;
+  }
+
+  /* ---------- SCREEN 4: final letter + photos ---------- */
+  #screen-final{
+    flex-direction:column;
+    justify-content:flex-start;
+    padding:calc(6vh + env(safe-area-inset-top)) 7vw calc(4rem + env(safe-area-inset-bottom));
+    text-align:center;
+    opacity:0;
+    transform:translateY(30px) scale(.95);
+    filter:blur(8px);
+    pointer-events:none;
+    transition:opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1), filter .7s ease;
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+  #screen-final.active{
+    opacity:1; transform:translateY(0) scale(1); filter:blur(0); pointer-events:auto;
+  }
+
+  .final-eyebrow{
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.7rem;
+    letter-spacing:.24em;
+    text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:.6rem;
+  }
+  .final-title{
+    font-family:'Bubblegum Sans',cursive;
+    font-weight:700;
+    font-size:1.7rem;
+    color:var(--purple-deep);
+    margin:0 0 1.2rem;
+  }
+
+  .photo-row{
+    display:flex;
+    gap:.7rem;
+    justify-content:center;
+    margin-bottom:1.6rem;
+    flex-wrap:wrap;
+  }
+  .photo-slot{
+    width:104px; height:104px;
+    border-radius:14px;
+    object-fit:cover;
+    background:var(--paper);
+    border:3px solid #fff;
+    box-shadow:0 6px 16px rgba(107,70,193,.22);
+  }
+
+  .letter-card{
+    background:var(--paper);
+    border-radius:18px;
+    padding:1.6rem 1.4rem;
+    max-width:420px;
+    text-align:left;
+    box-shadow:0 12px 26px rgba(107,70,193,.18);
+    font-size:.95rem;
+    line-height:1.7;
+    color:var(--ink);
+  }
+  .letter-card .sign{
+    display:block;
+    margin-top:1rem;
+    font-family:'Bubblegum Sans',cursive;
+    color:var(--rose);
+    font-weight:600;
+  }
+
+  .trade-frame.pop{
+    animation:framePop .55s cubic-bezier(.34,1.56,.64,1);
+  }
+  @keyframes framePop{
+    0%{ transform:scale(.72); opacity:0; }
+    60%{ transform:scale(1.06); opacity:1; }
+    100%{ transform:scale(1); opacity:1; }
+  }
+
+  /* ---------- loading overlay (Roblox-style) ---------- */
+  #screen-loading{
+    flex-direction:column;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .3s ease;
+    z-index:55;
+  }
+  #screen-loading.active{
+    opacity:1;
+    pointer-events:auto;
+  }
+  .spinner{
+    width:46px; height:46px;
+    border-radius:50%;
+    background:conic-gradient(from 0deg, var(--rose), var(--purple-mid), var(--rose-soft), var(--rose));
+    -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+            mask:radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 6px));
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .loading-label{
+    margin-top:1.1rem;
+    font-family:'Bubblegum Sans',cursive;
+    font-size:.85rem;
+    letter-spacing:.08em;
+    color:var(--purple-deep);
+  }
+
+  .loading-bar{
+    margin-top:1rem;
+    width:min(60vw, 220px);
+    height:8px;
+    border-radius:999px;
+    background:#ddceef;
+    overflow:hidden;
+  }
+  .loading-bar-fill{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    background:linear-gradient(90deg, var(--rose), var(--purple-mid));
+    transition:width .55s cubic-bezier(.22,1,.36,1);
+  }
+
+  /* ---------- polaroid photos ---------- */
+  .photo-row{
+    display:flex;
+    gap:1rem;
+    justify-content:center;
+    margin-bottom:2rem;
+    flex-wrap:wrap;
+    padding-top:.6rem;
+  }
+  .polaroid{
+    position:relative;
+    background:#fff;
+    padding:8px 8px 20px;
+    border-radius:5px;
+    width:104px;
+    box-shadow:0 12px 22px rgba(107,70,193,.28), 0 2px 5px rgba(0,0,0,.08);
+    transition:transform .2s ease;
+  }
+  .polaroid img{
+    width:100%;
+    height:110px;
+    object-fit:contain;
+    display:block;
+    border-radius:2px;
+  }
+  .polaroid::before{
+    content:"";
+    position:absolute;
+    top:-9px; left:50%;
+    width:42px; height:16px;
+    background:rgba(255,255,255,.6);
+    border:1px solid rgba(255,255,255,.8);
+    box-shadow:0 2px 4px rgba(0,0,0,.1);
+  }
+  .polaroid.rot-a{ transform:rotate(-7deg); }
+  .polaroid.rot-a::before{ transform:translateX(-50%) rotate(-5deg); }
+  .polaroid.rot-b{ transform:rotate(4deg); margin-top:12px; }
+  .polaroid.rot-b::before{ transform:translateX(-50%) rotate(3deg); }
+  .polaroid.rot-c{ transform:rotate(-3deg); }
+  .polaroid.rot-c::before{ transform:translateX(-50%) rotate(-2deg); }
+  .polaroid:active{ transform:rotate(0deg) scale(1.06); }
+
+  /* ---------- closing interaction ---------- */
+  .closing-heart{
+    margin-top:2rem;
+    width:74px; height:74px;
+    border-radius:50%;
+    border:none;
+    background:transparent;
+    padding:0;
+    box-shadow:0 10px 22px rgba(238,63,115,.35);
+    cursor:pointer;
+    transition:transform .15s ease;
+    overflow:hidden;
+  }
+  .closing-heart img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    pointer-events:none;
+  }
+  .closing-heart:active{ transform:scale(.86); }
+
+  .closing-msg{
+    margin-top:.8rem;
+    font-size:.85rem;
+    font-weight:600;
+    color:var(--purple-mid);
+    min-height:1.2em;
+  }
+
+  .replay-link{
+    margin-top:1.8rem;
+    background:none;
+    border:none;
+    font-family:'Quicksand',sans-serif;
+    font-size:.75rem;
+    color:var(--purple-mid);
+    text-decoration:underline;
+    opacity:.7;
+    cursor:pointer;
+  }
+
+  .music-toggle{
+    position:fixed;
+    top:max(16px, env(safe-area-inset-top));
+    right:16px;
+    z-index:80;
+    width:42px; height:42px;
+    border-radius:50%;
+    border:none;
+    background:rgba(255,255,255,.75);
+    box-shadow:0 6px 16px rgba(107,70,193,.25);
+    font-size:1.15rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .music-toggle:active{ transform:scale(.88); }
+
+  #rotate-overlay{
+    position:fixed; inset:0;
+    z-index:200;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1rem;
+    text-align:center;
+    padding:8vw;
+    background:var(--bg-0);
+  }
+  #rotate-overlay .rotate-icon{
+    font-size:2.6rem;
+    animation:rotateHint 1.6s ease-in-out infinite;
+  }
+  @keyframes rotateHint{
+    0%,100%{ transform:rotate(0deg); }
+    50%{ transform:rotate(-90deg); }
+  }
+  #rotate-overlay p{
+    font-family:'Bubblegum Sans',cursive;
+    color:var(--purple-deep);
+    font-size:1.1rem;
+    max-width:24ch;
+    margin:0;
+  }
+  @media (orientation:landscape) and (max-height:600px){
+    #rotate-overlay{ display:flex; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-decor">
+  <div class="blob blob-a"></div>
+  <div class="blob blob-b"></div>
+  <div class="blob blob-c"></div>
+  <div class="doodle" style="top:10%; left:12%;">💗</div>
+  <div class="doodle" style="top:22%; left:78%;">✨</div>
+  <div class="doodle" style="top:48%; left:6%;">💜</div>
+  <div class="doodle" style="top:66%; left:85%;">💌</div>
+  <div class="doodle" style="top:80%; left:20%;">✨</div>
+  <div class="doodle" style="top:88%; left:60%;">💞</div>
+</div>
+
+<canvas id="confetti-canvas"></canvas></canvas>
+<div class="wash" id="wash"></div>
+<button class="music-toggle" id="music-toggle" aria-label="Toggle background music">🔊</button>
+<audio id="bg-music" src="bg-music.mp3?v=1" loop preload="auto"></audio>
+<div id="rotate-overlay">
+  <div class="rotate-icon">📱</div>
+  <p>this one's made for portrait — flip your phone back up! 💌</p>
+</div>
+
+<div class="screen" id="screen-envelope">
+  <h1 class="headline">Happy 3rd Monthsary Baby!! Open Me!</h1>
+
+  <button class="envelope-wrap" id="envelope" aria-label="Tap the envelope">
+    <img src="envelope.png?v=2" alt="A pink envelope with a heart seal">
+  </button>
+
+  <div class="progress" id="progress"></div>
+  <div class="hint" id="hint"></div>
+</div>
+
+<div class="screen" id="screen-reveal">
+  <div class="reveal-heart">🔔</div>
+  <div class="reveal-eyebrow">trade request</div>
+  <h2 class="reveal-title">Trade Incoming!</h2>
+  <p class="reveal-body">
+    Some noob named Brent wants to trade with you!
+  </p>
+  <button class="continue-btn" id="to-trade">view trade 🤝</button>
+</div>
+
+<div class="screen" id="screen-loading">
+  <div class="spinner"></div>
+  <div class="loading-label">loading trade...</div>
+  <div class="loading-bar"><div class="loading-bar-fill" id="loading-fill"></div></div>
+</div>
+
+<div class="screen" id="screen-trade">
+  <p class="trade-title">put whatever you're feeling on your side. mine's already set.</p>
+
+  <div class="trade-frame">
+    <img class="bg" src="trade.jpg?v=2" alt="Trade window">
+    <div class="slot you" data-slot="0" style="left:11.97%; top:25.12%; width:13.74%; height:24.64%;"></div>
+    <div class="slot you" data-slot="1" style="left:27.07%; top:25.12%; width:13.74%; height:24.64%;"></div>
+    <div class="slot you" data-slot="2" style="left:11.97%; top:52.17%; width:13.74%; height:24.40%;"></div>
+    <div class="slot you" data-slot="3" style="left:27.07%; top:52.17%; width:13.74%; height:24.40%;"></div>
+
+    <div class="slot" style="left:58.78%; top:25.12%; width:13.74%; height:24.64%;">💌</div>
+    <div class="slot" style="left:73.88%; top:25.12%; width:13.74%; height:24.64%;">😘</div>
+
+    <div class="btn-hit" id="btn-decline" style="left:26.94%; top:81.4%; width:22.04%; height:11.59%;"></div>
+    <div class="btn-hit" id="btn-accept" style="left:54.15%; top:81.4%; width:22.04%; height:11.59%;"></div>
+  </div>
+
+  <div class="emoji-picker">
+    <div class="emoji-chip" data-emoji="😽">😽</div>
+    <div class="emoji-chip" data-emoji="❣️">❣️</div>
+    <div class="emoji-chip" data-emoji="😍">😍</div>
+    <div class="emoji-chip" data-emoji="🫶">🫶</div>
+  </div>
+  <div class="trade-hint" id="trade-hint">pick what you're feeling, then hit accept</div>
+</div>
+
+<div class="screen" id="screen-final">
+  <div class="final-eyebrow">trade complete</div>
+  <h2 class="final-title">happy monthsary, love</h2>
+
+  <div class="photo-row">
+    <div class="polaroid rot-a"><img src="photo1.jpg?v=2" alt="Photo strip of the two of us"></div>
+    <div class="polaroid rot-b"><img src="photo2.jpg?v=2" alt="Mirror selfie of the two of us"></div>
+    <div class="polaroid rot-c"><img src="photo3.jpg?v=2" alt="Another mirror selfie of the two of us"></div>
+  </div>
+
+  <div class="letter-card">
+    Happy Monthsary Bebi!! I can't believe it, 3 months na tayo! Heheheh parang last time lang nahihiya pa tayo, look at us now! I can believe it, I'm so so so so happy na magkasama tau together padin, thank you for putting up with my kulit and pagkakamali. I love love love you so much and I'm sorry if we can't be together for our special day :( I hope you know na I love love love you sooo much!!! Hehehehehhe, More months and years and decades to come!
+  </div>
+
+  <button class="closing-heart" id="closing-heart" aria-label="Tap for one more surprise"><img src="heart-button.png?v=2" alt="Heart" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:'💗',style:'font-size:1.6rem;display:flex;align-items:center;justify-content:center;width:100%;height:100%;'}))"></button>
+  <div class="closing-msg" id="closing-msg"></div>
+  <button class="replay-link" id="replay-btn">start over ↺</button>
+</div>
+
+<script>
+(function(){
+  const TOTAL = 24;
+  let count = 0;
+  let done = false;
+
+  const envelope = document.getElementById('envelope');
+  const progress = document.getElementById('progress');
+  const hint = document.getElementById('hint');
+  const screenEnvelope = document.getElementById('screen-envelope');
+  const screenReveal = document.getElementById('screen-reveal');
+
+  const hints = [
+    "tap it, love",
+    "keep going",
+    "you're doing great",
+    "getting closer",
+    "almost there",
+    "don't stop now",
+    "so close",
+    "one more..."
+  ];
+
+  // build progress pips
+  for(let i=0;i<TOTAL;i++){
+    const p = document.createElement('div');
+    p.className = 'pip';
+    progress.appendChild(p);
+  }
+  const pips = progress.querySelectorAll('.pip');
+
+  const floatEmojis = ['💜','💗','💞','✨','💌'];
+  void hints; // kept only for reference, no longer displayed as text
+
+  const wash = document.getElementById('wash');
+  function playWash(){
+    wash.classList.remove('run');
+    void wash.offsetWidth;
+    wash.classList.add('run');
+  }
+
+  let audioCtx = null;
+  function getAudioCtx(){
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+  }
+
+  function playClick(){
+    try{
+      const ctx = getAudioCtx();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1050, now);
+      osc.frequency.exponentialRampToValueAtTime(650, now + 0.09);
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.16, now + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    }catch(e){ /* audio not available, silently skip */ }
+  }
+
+  function playDing(){
+    try{
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      const now = audioCtx.currentTime;
+      [880, 1320].forEach((freq, i)=>{
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0, now + i*0.09);
+        gain.gain.linearRampToValueAtTime(0.18, now + i*0.09 + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + i*0.09 + 0.35);
+        osc.connect(gain).connect(audioCtx.destination);
+        osc.start(now + i*0.09);
+        osc.stop(now + i*0.09 + 0.4);
+      });
+    }catch(e){ /* audio not available, silently skip */ }
+  }
+
+  /* ---------- background music (gentle generated pad + sparkle melody) ---------- */
+  let musicStarted = false;
+  let musicMuted = false;
+  const bgMusic = document.getElementById('bg-music');
+  if(bgMusic) bgMusic.volume = 0.35;
+
+  function startBackgroundMusic(){
+    if(musicStarted || !bgMusic) return;
+    musicStarted = true;
+    bgMusic.play().catch(()=>{ musicStarted = false; });
+  }
+
+  const musicToggleBtn = document.getElementById('music-toggle');
+  musicToggleBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    playClick();
+    musicMuted = !musicMuted;
+    if(bgMusic) bgMusic.muted = musicMuted;
+    musicToggleBtn.textContent = musicMuted ? '🔇' : '🔊';
+    startBackgroundMusic();
+  });
+
+  // start music on the very first tap/click anywhere (satisfies mobile autoplay rules)
+  document.addEventListener('click', startBackgroundMusic, { once:true });
+
+  function spawnFloatHeart(x, y){
+    const el = document.createElement('div');
+    el.className = 'float-heart';
+    el.textContent = floatEmojis[Math.floor(Math.random()*floatEmojis.length)];
+    el.style.left = (x - 10 + (Math.random()*20-10)) + 'px';
+    el.style.top = (y - 10) + 'px';
+    document.body.appendChild(el);
+    setTimeout(()=> el.remove(), 950);
+  }
+
+  function updateHint(){
+    const remaining = TOTAL - count;
+    hint.textContent = remaining > 0 ? remaining + ' Taps Left!' : 'Opening... 💌';
+  }
+  updateHint();
+
+  function onTap(e){
+    if(done) return;
+    count++;
+
+    playClick();
+
+    // visuals
+    envelope.classList.remove('tapped');
+    void envelope.offsetWidth;
+    envelope.classList.add('tapped');
+
+    const rect = envelope.getBoundingClientRect();
+    const x = (e.touches && e.touches[0]) ? e.touches[0].clientX : (e.clientX || rect.left + rect.width/2);
+    const y = (e.touches && e.touches[0]) ? e.touches[0].clientY : (e.clientY || rect.top);
+    spawnFloatHeart(x, rect.top + rect.height*0.25);
+
+    if(pips[count-1]) pips[count-1].classList.add('on');
+
+    if(navigator.vibrate) navigator.vibrate(12);
+
+    updateHint();
+
+    if(count >= TOTAL){
+      done = true;
+      envelope.classList.add('shake');
+      setTimeout(explode, 420);
+    }
+  }
+
+  envelope.addEventListener('click', onTap);
+
+  function explode(){
+    launchConfetti();
+    playWash();
+    setTimeout(()=>{
+      screenEnvelope.classList.add('leaving');
+      screenReveal.classList.add('active');
+    }, 550);
+  }
+
+  /* ---------- screen 2 -> loading -> 3: trade ---------- */
+  const screenTrade = document.getElementById('screen-trade');
+  const screenFinal = document.getElementById('screen-final');
+  const screenLoading = document.getElementById('screen-loading');
+  const loadingFill = document.getElementById('loading-fill');
+  const tradeFrame = document.querySelector('.trade-frame');
+  const toTradeBtn = document.getElementById('to-trade');
+
+  toTradeBtn.addEventListener('click', ()=>{
+    playClick();
+    screenReveal.classList.remove('active');
+    screenReveal.style.opacity = 0;
+    screenReveal.style.transform = 'translateY(-24px) scale(1.05)';
+    screenReveal.style.filter = 'blur(8px)';
+    screenReveal.style.pointerEvents = 'none';
+
+    screenLoading.classList.add('active');
+    loadingFill.style.width = '0%';
+    requestAnimationFrame(()=>{
+      setTimeout(()=>{ loadingFill.style.width = '100%'; }, 60);
+    });
+
+    setTimeout(()=>{
+      screenLoading.classList.remove('active');
+      playDing();
+      playWash();
+      screenTrade.classList.add('active');
+      tradeFrame.classList.remove('pop');
+      void tradeFrame.offsetWidth;
+      tradeFrame.classList.add('pop');
+    }, 850);
+  });
+
+  const chips = document.querySelectorAll('.emoji-chip');
+  const slots = document.querySelectorAll('.slot.you');
+  const tradeHint = document.getElementById('trade-hint');
+  const selected = []; // ordered list of chosen emoji
+
+  function renderSlots(){
+    slots.forEach((slot, i)=>{
+      const emoji = selected[i];
+      if(emoji){
+        if(slot.textContent !== emoji){
+          slot.textContent = emoji;
+          slot.classList.remove('filled');
+          void slot.offsetWidth;
+          slot.classList.add('filled');
+        }
+      } else {
+        slot.textContent = '';
+        slot.classList.remove('filled');
+      }
+    });
+  }
+
+  chips.forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      playClick();
+      const emoji = chip.dataset.emoji;
+      const idx = selected.indexOf(emoji);
+      if(idx > -1){
+        selected.splice(idx,1);
+        chip.classList.remove('selected');
+      } else {
+        if(selected.length >= 4) return;
+        selected.push(emoji);
+        chip.classList.add('selected');
+      }
+      renderSlots();
+      tradeHint.textContent = selected.length
+        ? "Press Accept if you're good to go!"
+        : "pick what you're feeling, then hit accept";
+    });
+  });
+
+  document.getElementById('btn-decline').addEventListener('click', ()=>{
+    playClick();
+    tradeHint.textContent = "wait no come back 🥺";
+    const frame = document.querySelector('.trade-frame');
+    frame.style.transition = 'transform .4s ease';
+    frame.style.transform = 'translateX(-6px)';
+    setTimeout(()=>{ frame.style.transform = 'translateX(6px)'; }, 100);
+    setTimeout(()=>{ frame.style.transform = 'translateX(0)'; }, 220);
+  });
+
+  document.getElementById('btn-accept').addEventListener('click', ()=>{
+    playClick();
+    if(selected.length === 0){
+      tradeHint.textContent = "add at least one before you accept 💗";
+      return;
+    }
+    tradeHint.textContent = "trade accepted 💌";
+    launchConfetti();
+    playWash();
+    setTimeout(()=>{
+      screenTrade.classList.remove('active');
+      screenFinal.classList.add('active');
+    }, 500);
+  });
+
+  /* ---------- closing interaction ---------- */
+  const closingHeart = document.getElementById('closing-heart');
+  const closingMsg = document.getElementById('closing-msg');
+  const replayBtn = document.getElementById('replay-btn');
+
+  const closingLines = [
+    "still not tired of you 💗",
+    "okay fine, one more tap 🥹",
+    "3 months down, forever to go",
+    "yes I mean all of it",
+    "go re-read the letter hehe"
+  ];
+  let closingIndex = 0;
+
+  closingHeart.addEventListener('click', (e)=>{
+    playClick();
+    closingMsg.textContent = closingLines[closingIndex % closingLines.length];
+    closingIndex++;
+    const rect = closingHeart.getBoundingClientRect();
+    for(let i=0;i<3;i++){
+      setTimeout(()=> spawnFloatHeart(rect.left + rect.width/2, rect.top), i*90);
+    }
+    closingHeart.style.transform = 'scale(1.15)';
+    setTimeout(()=>{ closingHeart.style.transform = ''; }, 160);
+    if(navigator.vibrate) navigator.vibrate(10);
+  });
+
+  replayBtn.addEventListener('click', ()=>{
+    playClick();
+    location.reload();
+  });
+
+  /* ---------- confetti ---------- */
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let rafId = null;
+
+  function resize(){
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    canvas.style.width = window.innerWidth + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const colors = ['#ee3f73','#f8a8c0','#8b6fd6','#6b46c1','#ffd166','#ffffff'];
+
+  function launchConfetti(){
+    const cx = window.innerWidth/2;
+    const cy = window.innerHeight*0.42;
+    const N = 140;
+    for(let i=0;i<N;i++){
+      const angle = Math.random()*Math.PI*2;
+      const speed = 4 + Math.random()*9;
+      particles.push({
+        x: cx, y: cy,
+        vx: Math.cos(angle)*speed,
+        vy: Math.sin(angle)*speed - 3,
+        size: 5 + Math.random()*6,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        rot: Math.random()*Math.PI*2,
+        vr: (Math.random()-0.5)*0.35,
+        shape: Math.random() < 0.5 ? 'rect' : 'circle',
+        life: 0,
+        maxLife: 90 + Math.random()*40
+      });
+    }
+    if(!rafId) tick();
+  }
+
+  function tick(){
+    ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+    particles.forEach(p=>{
+      p.life++;
+      p.vy += 0.16; // gravity
+      p.vx *= 0.99;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+
+      const fade = Math.max(0, 1 - p.life/p.maxLife);
+      ctx.save();
+      ctx.globalAlpha = fade;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.fillStyle = p.color;
+      if(p.shape === 'rect'){
+        ctx.fillRect(-p.size/2, -p.size/3, p.size, p.size*0.6);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0,0,p.size/2,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+
+    particles = particles.filter(p => p.life < p.maxLife && p.y < window.innerHeight + 40);
+
+    if(particles.length > 0){
+      rafId = requestAnimationFrame(tick);
+    } else {
+      rafId = null;
+      ctx.clearRect(0,0,window.innerWidth, window.innerHeight);
+    }
+  }
+})();
+</script>
+
+</body>
+</html>
